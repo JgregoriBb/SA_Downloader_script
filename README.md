@@ -31,7 +31,7 @@ pip3 install jupyter
     * Read course information.
     * Read assessment information.
     * Read attempt information
-**Warning**
+
 > Do NOT use an admin user to register your application!
 
 More information can be found in Anthology´s [developer 
