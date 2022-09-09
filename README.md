@@ -2,7 +2,9 @@
 
 This script runs through Blackboard Learn Courses and downloads student sumbissions for assessesments that have the Safeassign anti-plagiarisim tool enabled. A folder is created for each assignment and the user Id is included in the file name for further processing. 
 
-This script has not been tested for windows computers
+This script has not been tested for windows computers.
+
+> This script currently supports Ulta courses. Adding support for original courses in the next few days
 
 ## Setup
 
