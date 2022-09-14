@@ -42,6 +42,8 @@ def main():
                                     os.chdir('../..')
     print('[DOWNLOADER] safeAssign assignments download complete for original courses')
     ultra_courses = downloader.get_courses_ultra()
+    print(
+        f'[DOWNLOADER] {len(original_courses)} Ultra courses found in the system.')
     for c in alive_it(ultra_courses):
         print(f'[Downloader] Finding assessments for course {c["id"]}')
         assesments = downloader.get_sa_assessments(c['id'])
@@ -67,9 +69,8 @@ def main():
                             file = downloader.download_file(
                                 c['id'], at['id'], metadata[0]['id'], name)
                             os.chdir('../..')
-    print(
-        f'[DOWNLOADER] {len(original_courses)} Ultra courses found in the system.')
-    ultra(ultra_courses)
+
+    print('[DOWNLOADER] safeAssign assignments download complete for ultra courses')
 
 
 if __name__ == "__main__":
