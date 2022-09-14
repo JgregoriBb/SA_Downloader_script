@@ -4,7 +4,7 @@ This script runs through Blackboard Learn Courses and downloads student sumbissi
 
 This script has not been tested for windows computers.
 
-> This script currently supports Ulta courses. Adding support for original courses in the next few days
+> :warning: This script now supports Original (Classic) and Ultra courses, however, it does consume more API calls, when using in production, make sure to contact Blackboard Support and request the API call rate to be raised (default for dev apps is 10k)
 
 ## Setup
 
@@ -34,7 +34,9 @@ pip3 install jupyter
     * Read assessment information.
     * Read attempt information
 
-> Do NOT use an admin user to register your application!
+>:warning: Do NOT use an admin user to register your application!
+
+>:warning: Make sure to log a ticket to raise the API rate
 
 More information can be found in Anthology´s [developer 
 documentation page](https://docs.anthology.com/rest-apis/learn/getting-started/registry)
@@ -55,5 +57,20 @@ Once setup is complete, the script can be run from a terminal.
 ```Python
 Python3 app.py
 ```
+## Script results
 
+By default, the script will create a folder called 'sa_submissions' in the root folder of the application.
+
+After that, the script will create a folder for each of the courses where there are safeAssign enabled assessments with files to download, the folder name follows the following convention.
+```
+course_id_ultraStatus_course_name
+```
+Whithin this folder, one folder will be created for each one of the assessments with the following naming convention.
+```
+course_id_assessment_id_assesment_name
+ ```
+Whitin this folder, the files will be downloaded with the following naming convention.
+```
+user_id_file_name_extension 
+```
 
