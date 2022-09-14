@@ -8,7 +8,6 @@ def main():
     downloader = Downloader()
     tools = Tools()
     tools.create_folder('./sa_submissions')
-    '''
     print('[DOWNLOADER] Processing Original courses.')
     original_courses = downloader.get_courses_original()
     print(
@@ -42,7 +41,6 @@ def main():
                                         c['id'], at['id'], metadata[0]['id'], name)
                                     os.chdir('../..')
     print('[DOWNLOADER] safeAssign assignments download complete for original courses')
-    '''
     print('[DOWNLOADER] Processing Ultra courses.')
     ultra_courses = downloader.get_courses_ultra()
     print(
