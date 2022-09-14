@@ -8,6 +8,7 @@ def main():
     downloader = Downloader()
     tools = Tools()
     tools.create_folder('./sa_submissions')
+    '''
     print('[DOWNLOADER] Processing Original courses.')
     original_courses = downloader.get_courses_original()
     print(
@@ -41,12 +42,14 @@ def main():
                                         c['id'], at['id'], metadata[0]['id'], name)
                                     os.chdir('../..')
     print('[DOWNLOADER] safeAssign assignments download complete for original courses')
+    '''
+    print('[DOWNLOADER] Processing Ultra courses.')
     ultra_courses = downloader.get_courses_ultra()
     print(
-        f'[DOWNLOADER] {len(original_courses)} Ultra courses found in the system.')
+        f'[DOWNLOADER] {len(ultra_courses)} Ultra courses found in the system.')
     for c in alive_it(ultra_courses):
         print(f'[Downloader] Finding assessments for course {c["id"]}')
-        assesments = downloader.get_sa_assessments(c['id'])
+        assesments = downloader.get_sa_assessments_ultra(c['id'])
         if assesments:
             for a in assesments:
                 print(
