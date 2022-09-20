@@ -22,7 +22,7 @@ source env/bin/activate
 3. Install dependencies, either from 'requirements.txt' or manually.
 ```Python
 #dependencies from requeriments.txt
-pip3 -r requeriments.txt
+pip3 install -r requeriments.txt
 
 #dependencies manually
 pip3 install Bb-rest-helper
