@@ -33,9 +33,9 @@ def main():
                                     print(
                                         '[DOWNLOADER] Retrieving file metadata and downloading file.')
                                     tools.create_folder(
-                                        f'{c["id"]}_{c["ultraStatus"]}_{c["name"]}')
+                                        f'{c["id"]}_{c["ultraStatus"]}_{c["name"][0:15]}')
                                     tools.create_folder(
-                                        f'./{c["id"]}_{a["id"]}__{a["title"]}')
+                                        f'./{c["id"]}_{a["id"]}__{a["title"][0:15]}')
                                     name = f'{at["userId"]}_{metadata[0]["name"]}'
                                     file = downloader.download_file(
                                         c['id'], at['id'], metadata[0]['id'], name)
