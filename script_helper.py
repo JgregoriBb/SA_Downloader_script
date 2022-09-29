@@ -8,6 +8,11 @@ import os
 import requests
 from requests import HTTPError
 from alive_progress import alive_bar
+import json
+import logging
+import time
+import datetime
+import csv
 
 
 # A class with the neccesary methods to download attempt files from
@@ -17,14 +22,82 @@ class Downloader:
     # This method initializes the Donwloader class, by default handles all that is needed
     # for authentication logging and utils. No arguments are needed.
     def __init__(self):
-
-        self.utils = Bb_Utils()
-        self.utils.set_logging()
-        self.quick_auth_learn = self.utils.quick_auth(
-            './credentials/learn_config.json', 'Learn')
-        self.learn_token = self.quick_auth_learn['token']
-        self.learn_url = self.quick_auth_learn['url']
+        # remove logging for pruduction
+        #self.utils = Bb_Utils()
+        #self.utils.set_logging()
+        self.conf = Get_Config('./credentials/learn_config.json')
+        self.learn_url = self.conf.get_url()
+        self.learn_token = None
         self.reqs = Bb_Requests()
+
+    # Method that returns True when the token expires.
+
+    def token_is_expired(self, expiration_datetime):
+        time_left = (expiration_datetime -
+                     datetime.datetime.now()).total_seconds()
+        if time_left < 1:
+            time.sleep(1)
+            return True
+        else:
+            return False
+
+    # Using this method instead of default for Bb-rest-helper auth to better handle
+    # token expiration, this will be updated in the library so this method is not needed.
+    def authenticate(self):
+        self.endpoint = "/learn/api/public/v1/oauth2/token"
+        self.params = {"grant_type": "client_credentials"}
+        self.headers = {
+            'Content-Type': "application/x-www-form-urlencoded"}
+
+        try:
+            if self.learn_token == None:
+                
+                r = requests.request(
+                    "POST",
+                    self.learn_url +
+                    self.endpoint,
+                    headers=self.headers,
+                    params=self.params,
+                    auth=(
+                        self.conf.get_key(),
+                        self.conf.get_secret()))
+                r.raise_for_status()
+                self.data = json.loads(r.text)
+                self.learn_token = self.data["access_token"]
+                self.expires = self.data["expires_in"]
+                m, s = divmod(self.expires, 60)
+                self.now = datetime.datetime.now()
+                self.expires_at = self.now + \
+                    datetime.timedelta(seconds=s, minutes=m)
+                logging.info("Learn Authentication successful")
+                logging.info("Token expires at: " + str(self.expires_at))
+                # return self.learn_token
+
+            elif self.token_is_expired(self.expires_at):
+                print('refresh token')
+                r = requests.request(
+                    "POST",
+                    self.learn_url +
+                    self.endpoint,
+                    headers=self.headers,
+                    params=self.params,
+                    auth=(
+                        self.conf.get_key(),
+                        self.conf.get_secret()))
+                r.raise_for_status()
+                self.data = json.loads(r.text)
+                self.learn_token = self.data["access_token"]
+                self.expires = self.data["expires_in"]
+                m, s = divmod(self.expires, 60)
+                self.now = datetime.datetime.now()
+                self.expires_at = self.now + \
+                    datetime.timedelta(seconds=s, minutes=m)
+                logging.info("Learn Authentication successful")
+                logging.info("Token expires at: " + str(self.expires_at))
+
+        except requests.exceptions.HTTPError as e:
+            data = json.loads(r.text)
+            logging.error(data["error_description"])
 
     # This method returns a list with all the Ultra courses in the target system, due to pagination this method
     # can take time to run. No arguments are needed.
@@ -97,6 +170,7 @@ class Downloader:
         self.content_area_list = []
         self.endpoint = f'/learn/api/public/v1/courses/{course_id}/contents'
         self.params = {
+            'recursive': True,
             'fields': 'id'
         }
         self.data = self.reqs.Bb_GET(
@@ -122,6 +196,7 @@ class Downloader:
         self.sa_assessment_list = []
         self.endpoint = f'/learn/api/public/v1/courses/{course_id}/contents/{content_area_id}/children'
         self.params = {
+            'recursive': True,
             'contentHandler': 'resource/x-bb-assignment',
             'fields': 'id,title,contentHandler.originalityReportingTool,contentHandler.gradeColumnId'}
         self.data = self.reqs.Bb_GET(
@@ -204,3 +279,39 @@ class Tools(Exception):
             os.chdir(path)
         except FileExistsError:
             os.chdir(path)
+
+    def read_from_csv(self, course_exp: str, path: str):
+        self.path = path
+        self.course_exp = course_exp
+        self.original_courses = []
+        self.ultra_courses = []
+        if self.course_exp == "original":
+            try:
+                with open(self.path,'r', newline='') as csvfile:
+                    self.reader = csv.DictReader(csvfile)
+                    for self.row in self.reader:
+                        self.data_to_append = {
+                            "id":self.row["course_id"],
+                            "ultraStatus":self.row["ultraStatus"],
+                            "name":self.row["course_name"]     
+                                }
+                        self.original_courses.append(self.data_to_append)
+                    return self.original_courses
+            except FileNotFoundError:
+                print('[DOWNLOADER] file not found!')
+        elif self.course_exp == "ultra":
+            try:
+                with open(path,'r', newline='') as csvfile:
+                    self.reader = csv.DictReader(csvfile)
+                    for self.row in self.reader:
+                        self.data_to_append = {
+                            "id":self.row["course_id"],
+                            "ultraStatus":self.row["ultraStatus"],
+                            "name":self.row["course_name"]     
+                                }
+                        self.ultra_courses.append(self.data_to_append)
+                    return self.ultra_courses
+            except FileNotFoundError:
+                print('[DOWNLOADER] file not found!')
+        else:
+            print('[DOWNLOADER] Invalid value, use "original" or "ultra"')
