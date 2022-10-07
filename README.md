@@ -98,13 +98,13 @@ By default, the script will create a folder called 'sa_submissions' in the root 
 After that, the script will create a folder for each of the courses where there are safeAssign enabled assessments with files to download, the folder name follows the following convention.
 
 ```csv
-course_id_ultraStatus_course_name
+course_id_ultraStatus_externalId
 ```
 
 Whithin this folder, one folder will be created for each one of the assessments with the following naming convention.
 
 ```csv
-course_id_assessment_id_assesment_name
+Assessment_course_id_external_id_assessment_id
  ```
 
 Whitin this folder, the files will be downloaded with the following naming convention.
