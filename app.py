@@ -81,18 +81,14 @@ def main():
                         metadata = downloader.get_file_metadata(
                             c["id"], at["id"])
                         if metadata:
-                            print(
-                                '------>[DOWNLOADER] Searching file metadata and downloading file.')
-                            tools.create_folder(
-                                f'{c["id"]}_{c["ultraStatus"]}_{c["name"]}')
-                            tools.create_folder(
-                                f'./{c["id"]}_{a["id"]}__{a["title"]}')
+                            print('------>[DOWNLOADER] Searching file metadata and downloading file.')
+                            tools.create_folder(f'{c["id"]}_{c["ultraStatus"]}_{c["external_id"]}')
+                            tools.create_folder(f'./Assessment_{c["id"]}_{c["external_id"]}_{a["id"]}')
                             name = f'{at["userId"]}_{metadata[0]["name"]}'
-                            file = downloader.download_file(
-                                c['id'], at['id'], metadata[0]['id'], name)
+                            file = downloader.download_file(c['id'], at['id'], metadata[0]['id'], name)
                             os.chdir('../..')
 
-    print('[DOWNLOADER] safeAssign assignments download complete for ultra courses')
+        print('[DOWNLOADER] safeAssign assignments download complete for ultra courses')
 
 
 if __name__ == "__main__":
