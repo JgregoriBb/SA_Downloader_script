@@ -9,7 +9,13 @@ test.py
 credentials
 research.ipynb
 sa_submissions
+sa_submissions_01
+sa_submissions_02
+sa_submissions_03
+sa_submissions_04
+sa_submissions_05
 input_files
+input_files_test
 
 # Editors
 .vscode/

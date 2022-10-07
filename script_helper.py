@@ -24,7 +24,7 @@ class Downloader:
     def __init__(self):
         # remove logging for pruduction
         #self.utils = Bb_Utils()
-        #self.utils.set_logging()
+        # self.utils.set_logging()
         self.conf = Get_Config('./credentials/learn_config.json')
         self.learn_url = self.conf.get_url()
         self.learn_token = None
@@ -42,7 +42,8 @@ class Downloader:
             return False
 
     # Using this method instead of default for Bb-rest-helper auth to better handle
-    # token expiration, this will be updated in the library so this method is not needed.
+    # token expiration, this will be updated in the library so this method is
+    # not needed.
     def authenticate(self):
         self.endpoint = "/learn/api/public/v1/oauth2/token"
         self.params = {"grant_type": "client_credentials"}
@@ -50,8 +51,8 @@ class Downloader:
             'Content-Type': "application/x-www-form-urlencoded"}
 
         try:
-            if self.learn_token == None:
-                
+            if self.learn_token is None:
+
                 r = requests.request(
                     "POST",
                     self.learn_url +
@@ -104,7 +105,7 @@ class Downloader:
     def get_courses_ultra(self):
         self.endpoint = '/learn/api/public/v3/courses'
         self.params = {
-            'fields': 'id,name,ultraStatus',
+            'fields': 'id,externalId,name,ultraStatus',
             'organization': False
         }
         self.data = self.reqs.Bb_GET(
@@ -124,7 +125,7 @@ class Downloader:
     def get_courses_original(self):
         self.endpoint = '/learn/api/public/v3/courses'
         self.params = {
-            'fields': 'id,name,ultraStatus',
+            'fields': 'id,externalId,name,ultraStatus',
             'organization': False
         }
         self.data = self.reqs.Bb_GET(
@@ -199,11 +200,16 @@ class Downloader:
             'recursive': True,
             'contentHandler': 'resource/x-bb-assignment',
             'fields': 'id,title,contentHandler.originalityReportingTool,contentHandler.gradeColumnId'}
-        self.data = self.reqs.Bb_GET(
-            self.learn_url,
-            self.endpoint,
-            self.learn_token,
-            self.params)
+        try:
+            self.data = self.reqs.Bb_GET(
+                self.learn_url,
+                self.endpoint,
+                self.learn_token,
+                self.params)
+        except BaseException():
+            #Using this to avoid errors thrown in the console when logging is off
+            pass
+
         for self.d in self.data:
             try:
                 if (self.d['contentHandler']['originalityReportingTool']['id'] ==
@@ -287,28 +293,30 @@ class Tools(Exception):
         self.ultra_courses = []
         if self.course_exp == "original":
             try:
-                with open(self.path,'r', newline='') as csvfile:
+                with open(self.path, 'r', newline='') as csvfile:
                     self.reader = csv.DictReader(csvfile)
                     for self.row in self.reader:
                         self.data_to_append = {
-                            "id":self.row["course_id"],
-                            "ultraStatus":self.row["ultraStatus"],
-                            "name":self.row["course_name"]     
-                                }
+                            "id": self.row["course_id"],
+                            "external_id": self.row["external_id"],
+                            "ultraStatus": self.row["ultraStatus"],
+                            "name": self.row["course_name"]
+                        }
                         self.original_courses.append(self.data_to_append)
                     return self.original_courses
             except FileNotFoundError:
                 print('[DOWNLOADER] file not found!')
         elif self.course_exp == "ultra":
             try:
-                with open(path,'r', newline='') as csvfile:
+                with open(path, 'r', newline='') as csvfile:
                     self.reader = csv.DictReader(csvfile)
                     for self.row in self.reader:
                         self.data_to_append = {
-                            "id":self.row["course_id"],
-                            "ultraStatus":self.row["ultraStatus"],
-                            "name":self.row["course_name"]     
-                                }
+                            "id": self.row["course_id"],
+                            "external_id": self.row["external_id"],
+                            "ultraStatus": self.row["ultraStatus"],
+                            "name": self.row["course_name"]
+                        }
                         self.ultra_courses.append(self.data_to_append)
                     return self.ultra_courses
             except FileNotFoundError:
